@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { plainToClass } from "class-transformer";
@@ -18,12 +22,49 @@ export class UsersService {
     return plainToClass(User, await this.usersRepository.save(user));
   }
 
-  async findByEmail(email: string) {
-    return await this.usersRepository.findOneBy({ email });
+  // return user without password and other stuff
+  async findByEmailPub(email: string): Promise<User> {
+    let user = plainToClass(
+      User,
+      await this.usersRepository.findOneBy({ email })
+    );
+    if (!user) {
+      throw new NotFoundException();
+    }
+    console.log(user);
+    return user;
+  }
+
+  async findByEmail(email: string): Promise<UserEntity> {
+    let user = await this.usersRepository.findOneBy({ email });
+    if (!user) {
+      throw new NotFoundException();
+    }
+
+    return user;
+  }
+
+  // return user without password and other stuff
+  async findByIdPub(id: string): Promise<User> {
+    let user = plainToClass(
+      User,
+      await this.usersRepository.findOneBy({ _id: id })
+    );
+
+    if (!user) {
+      throw new NotFoundException();
+    }
+
+    return user;
   }
 
   async findById(id: string): Promise<UserEntity> {
-    return await this.usersRepository.findOneBy({ _id: id });
+    let user = await this.usersRepository.findOneBy({ _id: id });
+    if (!user) {
+      throw new NotFoundException();
+    }
+
+    return user;
   }
 
   async updateUser(id: string, user: User): Promise<User> {

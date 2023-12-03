@@ -7,6 +7,7 @@ import { PassportModule } from "@nestjs/passport";
 import { AtStrategy } from "./strategies/at.strategy";
 import { RtStrategy } from "./strategies/rt.strategy";
 import { ConfigModule } from "@nestjs/config";
+import { MailingService } from "src/mailing/mailing.service";
 
 @Module({
   imports: [
@@ -21,6 +22,6 @@ import { ConfigModule } from "@nestjs/config";
     ConfigModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, AtStrategy, RtStrategy],
+  providers: [MailingService, AuthService, AtStrategy, RtStrategy],
 })
 export class AuthModule {}

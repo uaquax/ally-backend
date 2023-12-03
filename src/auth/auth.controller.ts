@@ -15,10 +15,14 @@ import { Public } from "src/auth/decorators/public.decorator";
 import { RtGuard } from "src/auth/guards/rt.guard";
 import { GetUser } from "src/auth/decorators/get-user.decorator";
 import { AtGuard } from "./guards/at.guard";
+import { MailingService } from "src/mailing/mailing.service";
 
 @Controller("api/auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly mailService: MailingService
+  ) {}
 
   @Post("signup")
   @Public()

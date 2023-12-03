@@ -5,6 +5,9 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { UsersModule } from "./users/users.module";
 import { AuthModule } from "./auth/auth.module";
 import { config } from "dotenv";
+import { AtGuard } from "./auth/guards/at.guard";
+import { APP_GUARD } from "@nestjs/core";
+import { MailingModule } from './mailing/mailing.module';
 
 config();
 
@@ -22,8 +25,14 @@ config();
     }),
     UsersModule,
     AuthModule,
+    MailingModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AtGuard,
+    },
+  ],
 })
 export class AppModule {}
