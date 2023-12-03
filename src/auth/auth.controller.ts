@@ -27,6 +27,7 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async signUp(@Body() dto: AuthSignUpDto): Promise<Tokens> {
     try {
+      console.log(dto);
       return await this.authService.signUp(dto);
     } catch (error) {
       if (error.code === "ER_DUP_ENTRY" || error.code == "23505") {
