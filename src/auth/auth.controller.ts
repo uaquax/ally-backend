@@ -6,6 +6,7 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import { AuthSignInDto, AuthSignUpDto } from "src/auth/dto/auth.dto";
@@ -19,10 +20,7 @@ import { MailingService } from "src/mailing/mailing.service";
 
 @Controller("api/auth")
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly mailService: MailingService
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post("signup")
   @Public()
@@ -40,6 +38,18 @@ export class AuthController {
         console.log(error);
         throw new HttpException("Bad request", HttpStatus.BAD_REQUEST);
       }
+    }
+  }
+
+  @Post("verify")
+  @HttpCode(HttpStatus.CREATED)
+  async verify(@GetUser("sub") user, @Query("code") code: string) {
+    try {
+      return {
+        is_activated: await this.authService.verify(user, code),
+      };
+    } catch (error) {
+      throw new HttpException(`Bad request: ${error}`, HttpStatus.BAD_REQUEST);
     }
   }
 

@@ -10,6 +10,7 @@ import { UserEntity } from "src/entities/user.entity";
 import { User } from "src/dto/user/user.dto";
 import { CreateUserDto } from "src/dto/user/create-user.dto";
 import { encode } from "src/uitils";
+import { SessionEntity } from "src/entities/session.entity";
 
 @Injectable()
 export class UsersService {
@@ -17,6 +18,24 @@ export class UsersService {
     @InjectRepository(UserEntity)
     private readonly usersRepository: Repository<UserEntity>
   ) {}
+
+  async activate(id: string) {
+    let user = await this.findById(id);
+    user.isActivated = true;
+
+    await this.usersRepository.save(user);
+  }
+
+  async findSession(id: string) {
+    let user = await this.usersRepository.findOne({
+      where: { _id: id },
+      relations: {
+        sessions: true,
+      },
+    });
+
+    return user.sessions;
+  }
 
   async createUser(user: User): Promise<User> {
     return plainToClass(User, await this.usersRepository.save(user));

@@ -1,5 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { v4 as uuidv4 } from "uuid";
+import { SessionEntity } from "./session.entity";
 
 @Entity({ name: "users" })
 export class UserEntity {
@@ -12,10 +19,10 @@ export class UserEntity {
   @Column({ nullable: true })
   public name: string;
 
-  @Column({ nullable: true })
+  @Column({ unique: true })
   public email: string;
 
-  @Column({ nullable: true })
+  @Column({ unique: true })
   public username: string;
 
   @Column({ default: false })
@@ -23,6 +30,10 @@ export class UserEntity {
 
   @Column({ nullable: true })
   public password: string;
+
+  @OneToMany(() => SessionEntity, (session) => session.user)
+  @JoinColumn()
+  sessions: SessionEntity[];
 
   @Column({
     name: "created_at",

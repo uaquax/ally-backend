@@ -7,7 +7,8 @@ import { AuthModule } from "./auth/auth.module";
 import { config } from "dotenv";
 import { AtGuard } from "./auth/guards/at.guard";
 import { APP_GUARD } from "@nestjs/core";
-import { MailingModule } from './mailing/mailing.module';
+import { MailingModule } from "./mailing/mailing.module";
+import { SessionEntity } from "./entities/session.entity";
 
 config();
 
@@ -20,7 +21,7 @@ config();
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [UserEntity],
+      entities: [UserEntity, SessionEntity],
       synchronize: true,
     }),
     UsersModule,

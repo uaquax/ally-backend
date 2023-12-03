@@ -5,18 +5,48 @@ import { AuthSignInDto, AuthSignUpDto } from "./dto/auth.dto";
 import { Tokens } from "../types/tokens";
 import { UsersService } from "../users/users.service";
 import { compare, encode } from "src/uitils";
+import { InjectRepository } from "@nestjs/typeorm";
+import { SessionEntity } from "src/entities/session.entity";
+import { Repository } from "typeorm";
+import { MailingService } from "src/mailing/mailing.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    @InjectRepository(SessionEntity)
+    private readonly sessionRepository: Repository<SessionEntity>,
+    private readonly mailService: MailingService
   ) {}
 
   async signUp(dto: AuthSignUpDto): Promise<Tokens> {
     const user = await this.usersService.signUp(dto);
     const tokens = this.getTokens(user._id, user.email, user.username);
+
+    let code = Math.floor(Math.random() * 9000) + 1000;
+
+    this.sessionRepository.save({
+      code: code.toString(),
+      user: user,
+    });
+    this.mailService.sendCode(code.toString());
+
     return tokens;
+  }
+
+  async verify(id: string, code: string): Promise<boolean> {
+    const sessions = await this.usersService.findSession(id);
+
+    sessions.forEach(async (session) => {
+      if (code == session.code) {
+        await this.usersService.activate(id);
+        await this.sessionRepository.remove(session);
+      }
+    });
+
+    let user = await this.usersService.findById(id);
+    return user.isActivated;
   }
 
   async signIn(dto: AuthSignInDto): Promise<Tokens> {

@@ -8,9 +8,13 @@ import { AtStrategy } from "./strategies/at.strategy";
 import { RtStrategy } from "./strategies/rt.strategy";
 import { ConfigModule } from "@nestjs/config";
 import { MailingService } from "src/mailing/mailing.service";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { UserEntity } from "src/entities/user.entity";
+import { SessionEntity } from "src/entities/session.entity";
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([UserEntity, SessionEntity]),
     JwtModule.register({
       secret: "jwt-secret",
       signOptions: {
